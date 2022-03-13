@@ -7,19 +7,16 @@ const readline = require("readline").createInterface({
 
 readline.question("Enter string 1: ", (str1) => {
 	readline.question("Enter string 2: ", (str2) => {
-		const levenshtein = new Levenshtein(str1, str2);
+		console.log();
 
-		levenshtein.calculate_distance();
-		levenshtein.calculate_backtrack();
-		levenshtein.print_distance_matrix();
-		levenshtein.print_bactrack();
-		levenshtein.visualize();
+		const levenshtein = new Levenshtein(str1, str2);
+		levenshtein.print();
 
 		readline.close();
 	});
 });
 
 readline.on("close", () => {
-	console.log("\nFinished...\n");
+	console.log("\tFinished...\n");
 	process.exit(0);
 });

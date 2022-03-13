@@ -13,7 +13,7 @@ const Levenshtein = class {
 		// check str1, str2 is defined
 		// if not, stop calculate;
 		if (this.str1 === undefined || this.str2 === undefined) {
-			console.log("str1 or str2 is not defined");
+			console.log("str1 or str2 is not defined\n");
 
 			return;
 		}
@@ -26,12 +26,25 @@ const Levenshtein = class {
 		// initialize first value
 		this.#result = new Array(length_row);
 
-		let output = "Levenshtein distance matrix\n---\n";
+		let output =
+			"Levenshtein distance matrix\n-----\n" +
+			"Shape: " +
+			length_row +
+			" X " +
+			length_column +
+			"\n";
 
 		for (let i = 0; i < length_row; i++) {
 			this.#result[i] = new Array(length_column);
 			this.#result[i][0] = i;
 		}
+
+		for (let j = 0; j < length_column; j++) {
+			if (j == 0) output += "      ";
+			else output += this.str2[j - 1] + "  ";
+		}
+
+		output += "\n   ";
 
 		for (let j = 0; j < length_column; j++) {
 			this.#result[0][j] = j;
@@ -47,8 +60,10 @@ const Levenshtein = class {
 
 				if (j == 1) {
 					output +=
+						this.str1[i - 1] +
+						"  " +
 						this.#result[i][j - 1] +
-						(9 < this.#result[i - 1][j - 1] ? " " : "  ");
+						(9 < this.#result[i][j - 1] ? " " : "  ");
 				}
 
 				output += this.#result[i][j] + (9 < this.#result[i][j] ? " " : "  ");
@@ -107,7 +122,7 @@ const Levenshtein = class {
 
 	calculate_backtrack() {
 		if (this.#result === undefined) {
-			console.log("first call calculate_distance, then call again");
+			console.log("first call calculate_distance, then call again\n");
 
 			return;
 		}
@@ -139,7 +154,7 @@ const Levenshtein = class {
 		this.#stat.reverse();
 
 		this.print_bactrack = () => {
-			let output = "Backtrack\n---\n";
+			let output = "Backtrack\n-----\nLength: " + this.#stat.length + "\n";
 			for (const i of this.#stat) {
 				output += i + " ";
 			}
@@ -149,32 +164,54 @@ const Levenshtein = class {
 		};
 	}
 
+	print_strs() {
+		if (this.str1 === undefined || this.str2 === undefined) {
+			console.log("Set str1 and str2, then call again\n");
+
+			return;
+		}
+
+		let output =
+			"Strings\n-----\n" +
+			"1---> " +
+			this.str1 +
+			" " +
+			this.str1.length +
+			"\n2---> " +
+			this.str2 +
+			" " +
+			this.str2.length +
+			"\n";
+
+		console.log(output);
+	}
+
 	print_bactrack() {
-		console.log("first call calculate_backtrack then call print_backtrack");
+		console.log("first call calculate_backtrack, then call print_backtrack\n");
 	}
 
 	print_distance_matrix() {
 		console.log(
-			"first call calculate_distance then call print_distance_matrix"
+			"first call calculate_distance, then call print_distance_matrix\n"
 		);
 	}
 
 	print_levenshtein_distance() {
 		if (this.#result === undefined) {
-			console.log("first call calculate_distance, then call again");
+			console.log("first call calculate_distance, then call again\n");
 
 			return;
 		}
 
 		console.log(
-			"Levenshtein distance: ",
-			this.#result[this.str1.length + 1][this.str2.length + 1]
+			"Levenshtein distance\n-----\n",
+			this.#result[this.str1.length][this.str2.length]
 		);
 	}
 
 	visualize() {
 		if (this.#stat === undefined) {
-			console.log("first call calculate_backtrack, then call again");
+			console.log("first call calculate_backtrack, then call again\n");
 
 			return;
 		}
@@ -214,7 +251,17 @@ const Levenshtein = class {
 			}
 		}
 
-		console.log("Visualize\n---\n" + str1 + "\n" + str2 + "\n" + str3);
+		console.log("Visualize\n-----\n" + str1 + "\n" + str2 + "\n" + str3 + "\n");
+	}
+
+	print() {
+		this.print_strs();
+		this.calculate_distance();
+		this.calculate_backtrack();
+		this.print_distance_matrix();
+		this.print_bactrack();
+		this.visualize();
+		this.print_levenshtein_distance();
 	}
 };
 
