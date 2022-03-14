@@ -44,17 +44,15 @@ const Levenshtein = class {
 			length_column +
 			"\n";
 
-		for (let j = 0; j < length_column; j++) {
-			if (j == 0) output += "     ";
-			else output += " " + this.str2[j - 1] + " ";
+		output += "     ";
+		for (let j = 1; j < length_column; j++) {
+			output += " " + this.str2[j - 1] + " ";
 		}
-
 		output += "\n  ";
 
 		for (let j = 0; j < length_column; j++) {
 			output += (9 < this.result[0][j] ? "" : " ") + this.result[0][j] + " ";
 		}
-
 		output += "\n";
 
 		//calculate each field
@@ -71,7 +69,6 @@ const Levenshtein = class {
 
 				output += (9 < this.result[i][j] ? "" : " ") + this.result[i][j] + " ";
 			}
-
 			output += "\n";
 		}
 

@@ -19,19 +19,19 @@ class WeightedDistance extends Levenshtein {
 	initialize(length_row, length_column) {
 		this.result = new Array(length_row);
 
-		for (let i = 0; i < length_row; i++) {
+		this.result[0] = new Array(length_column);
+		this.result[0][0] = 0;
+
+		for (let i = 1; i < length_row; i++) {
 			this.result[i] = new Array(length_column);
 
-			if (i != 0)
-				this.result[i][0] =
-					this.result[i - 1][0] + this.#confusing_row[this.str1[i - 1]];
-			else this.result[i][0] = 0;
+			this.result[i][0] =
+				this.result[i - 1][0] + this.#confusing_row[this.str1[i - 1]];
 		}
 
-		for (let j = 0; j < length_column; j++) {
-			if (j != 0)
-				this.result[0][j] =
-					this.result[0][j - 1] + this.#confusing_column[this.str2[j - 1]];
+		for (let j = 1; j < length_column; j++) {
+			this.result[0][j] =
+				this.result[0][j - 1] + this.#confusing_column[this.str2[j - 1]];
 		}
 	}
 
@@ -49,6 +49,12 @@ class WeightedDistance extends Levenshtein {
 		let choice;
 
 		switch (min) {
+			case this.str1[i - 1] === this.str2[j - 1] ? min : undefined:
+				choice = "none";
+				i--;
+				j--;
+				break;
+
 			case this.result[i - 1][j - 1] +
 				this.#confusing_matrix[this.str1[i - 1]][this.str2[j - 1]]:
 				choice = "switch";
