@@ -1,12 +1,22 @@
 const Levenshtein = class {
-	#result;
-	#stat;
-
 	constructor(str1 = undefined, str2 = undefined) {
 		this.str1 = str1;
 		this.str2 = str2;
-		this.#result = undefined;
-		this.#stat = undefined;
+		this.result = undefined;
+		this.stat = undefined;
+	}
+
+	initialize(length_row, length_column) {
+		this.result = new Array(length_row);
+
+		for (let i = 0; i < length_row; i++) {
+			this.result[i] = new Array(length_column);
+			this.result[i][0] = i;
+		}
+
+		for (let j = 0; j < length_column; j++) {
+			this.result[0][j] = j;
+		}
 	}
 
 	calculate_distance() {
@@ -24,7 +34,7 @@ const Levenshtein = class {
 		];
 
 		// initialize first value
-		this.#result = new Array(length_row);
+		this.initialize(length_row, length_column);
 
 		let output =
 			"Levenshtein distance matrix\n-----\n" +
@@ -34,39 +44,32 @@ const Levenshtein = class {
 			length_column +
 			"\n";
 
-		for (let i = 0; i < length_row; i++) {
-			this.#result[i] = new Array(length_column);
-			this.#result[i][0] = i;
+		for (let j = 0; j < length_column; j++) {
+			if (j == 0) output += "     ";
+			else output += " " + this.str2[j - 1] + " ";
 		}
 
-		for (let j = 0; j < length_column; j++) {
-			if (j == 0) output += "      ";
-			else output += this.str2[j - 1] + "  ";
-		}
-
-		output += "\n   ";
+		output += "\n  ";
 
 		for (let j = 0; j < length_column; j++) {
-			this.#result[0][j] = j;
-			output += j + (9 < j ? " " : "  ");
+			output += (9 < this.result[0][j] ? "" : " ") + this.result[0][j] + " ";
 		}
 
 		output += "\n";
 
 		//calculate each field
 		for (let i = 1; i < length_row; i++) {
+			output +=
+				this.str1[i - 1] +
+				" " +
+				(9 < this.result[i][0] ? "" : " ") +
+				this.result[i][0] +
+				" ";
+
 			for (let j = 1; j < length_column; j++) {
-				this.#result[i][j] = this.#choose_next_step(i, j);
+				this.result[i][j] = this.choose_next_step(i, j);
 
-				if (j == 1) {
-					output +=
-						this.str1[i - 1] +
-						"  " +
-						this.#result[i][j - 1] +
-						(9 < this.#result[i][j - 1] ? " " : "  ");
-				}
-
-				output += this.#result[i][j] + (9 < this.#result[i][j] ? " " : "  ");
+				output += (9 < this.result[i][j] ? "" : " ") + this.result[i][j] + " ";
 			}
 
 			output += "\n";
@@ -78,40 +81,40 @@ const Levenshtein = class {
 	}
 
 	// next --> choose remove, insert, switch or none
-	#choose_next_step(i, j) {
+	choose_next_step(i, j) {
 		return Math.min(
-			this.#result[i - 1][j] + 1, // remove
-			this.#result[i][j - 1] + 1, // insert
-			this.#result[i - 1][j - 1] +
+			this.result[i - 1][j] + 1, // remove
+			this.result[i][j - 1] + 1, // insert
+			this.result[i - 1][j - 1] +
 				(this.str1[i - 1] === this.str2[j - 1] ? 0 : 2) // none, switch
 		);
 	}
 
 	// backtrack --> choose remove, insert, switch or none
-	#choose_stat(i, j, min) {
+	choose_stat(i, j, min) {
 		let choice;
 
 		switch (min) {
 			case this.str1[i - 1] === this.str2[j - 1]
-				? this.#result[i][j]
+				? this.result[i][j]
 				: undefined:
 				choice = "none";
 				i--;
 				j--;
 				break;
 
-			case this.#result[i - 1][j - 1] + 2:
+			case this.result[i - 1][j - 1] + 2:
 				choice = "switch";
 				i--;
 				j--;
 				break;
 
-			case this.#result[i][j - 1] + 1:
+			case this.result[i][j - 1] + 1:
 				choice = "insert";
 				j--;
 				break;
 
-			case this.#result[i - 1][j] + 1:
+			case this.result[i - 1][j] + 1:
 				choice = "remove";
 				i--;
 				break;
@@ -121,41 +124,41 @@ const Levenshtein = class {
 	}
 
 	calculate_backtrack() {
-		if (this.#result === undefined) {
+		if (this.result === undefined) {
 			console.log("first call calculate_distance, then call again\n");
 
 			return;
 		}
 
-		this.#stat = new Array();
+		this.stat = new Array();
 
 		let i = this.str1.length,
 			j = this.str2.length;
 
 		while (i != 0 || j != 0) {
 			if (i != 0 && j == 0) {
-				while (i--) this.#stat.push("remove");
+				while (i--) this.stat.push("remove");
 				break;
 			}
 
 			if (j != 0 && i == 0) {
-				while (j--) this.#stat.push("insert");
+				while (j--) this.stat.push("insert");
 				break;
 			}
 
-			const min = this.#choose_next_step(i, j);
+			const min = this.choose_next_step(i, j);
 
 			let choice;
-			[i, j, choice] = this.#choose_stat(i, j, min);
+			[i, j, choice] = this.choose_stat(i, j, min);
 
-			this.#stat.push(choice);
+			this.stat.push(choice);
 		}
 
-		this.#stat.reverse();
+		this.stat.reverse();
 
 		this.print_bactrack = () => {
-			let output = "Backtrack\n-----\nLength: " + this.#stat.length + "\n";
-			for (const i of this.#stat) {
+			let output = "Backtrack\n-----\nLength: " + this.stat.length + "\n";
+			for (const i of this.stat) {
 				output += i + " ";
 			}
 			output += "\n";
@@ -197,7 +200,7 @@ const Levenshtein = class {
 	}
 
 	print_levenshtein_distance() {
-		if (this.#result === undefined) {
+		if (this.result === undefined) {
 			console.log("first call calculate_distance, then call again\n");
 
 			return;
@@ -205,12 +208,12 @@ const Levenshtein = class {
 
 		console.log(
 			"Levenshtein distance\n-----\n",
-			this.#result[this.str1.length][this.str2.length]
+			this.result[this.str1.length][this.str2.length]
 		);
 	}
 
 	visualize() {
-		if (this.#stat === undefined) {
+		if (this.stat === undefined) {
 			console.log("first call calculate_backtrack, then call again\n");
 
 			return;
@@ -223,7 +226,7 @@ const Levenshtein = class {
 		let i = 0,
 			j = 0;
 
-		for (const choice of this.#stat) {
+		for (const choice of this.stat) {
 			switch (choice) {
 				case "none":
 					str1 += this.str1[i++];
