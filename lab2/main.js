@@ -13,6 +13,7 @@ readline.question("Enter string 1: ", (str1) => {
 			"Levenshtein Distance\t---> 1\nWeighted Distance\t---> 2\n> ",
 			(mode) => {
 				console.log();
+				console.log("Weighted Distance is not finished!!!.")
 
 				let levenshtein;
 				switch (mode) {
